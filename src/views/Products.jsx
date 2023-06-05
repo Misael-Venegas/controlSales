@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, SafeAreaView, ToastAndroid } from 'react-native'
 
-
 const Products = () => {
-
- 
-    const db = SQLite.openDatabase({ name: 'mydatabase.db', createFromLocation: '~mydatabase.db' });
-    
     const [nombreProducto, setNombreProducto] = useState("");
     const [precioProducto, setPrecioProducto] = useState(0.0)
 

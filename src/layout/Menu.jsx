@@ -1,12 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Text, View } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Products from '../views/Products';
 import Sales from '../views/Sales';
 import Information from '../views/Information';
 import Ionicons from '@expo/vector-icons/Ionicons'
-
+import { connectionBD } from '../BD/connection'
 const Menu = () => {
+    let db = null;
+    useEffect(() => {
+        db = connectionBD();
+        console.log(db)
+    }, [])
+
 
     const Tab = createBottomTabNavigator();
 
@@ -37,8 +43,8 @@ const Menu = () => {
                     height: 60,
                     paddingHorizontal: 5,
                     paddingTop: 0,
-                   
-                   // backgroundColor: '#FFEB3B',
+
+                    // backgroundColor: '#FFEB3B',
                     position: 'absolute',
                     borderTopWidth: 0,
                 },
