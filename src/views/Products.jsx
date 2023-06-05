@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, SafeAreaView, ToastAndroid } from 'react-native'
+
+
 const Products = () => {
 
+ 
+    const db = SQLite.openDatabase({ name: 'mydatabase.db', createFromLocation: '~mydatabase.db' });
+    
     const [nombreProducto, setNombreProducto] = useState("");
     const [precioProducto, setPrecioProducto] = useState(0.0)
 
+
     const guardarProducto = () => {
         if (nombreProducto === "") {
+            ToastAndroid.show('Error: El nombre esta vacio', ToastAndroid.SHORT);
             return;
         }
         if (precioProducto <= 0) {
+            ToastAndroid.show('Error: El precio debe ser mayor a cero', ToastAndroid.SHORT);
             return;
         }
 
