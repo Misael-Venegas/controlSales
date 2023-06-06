@@ -1,18 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Products from '../views/Products';
-import Sales from '../views/Sales';
-import Information from '../views/Information';
+import Products from '../views/products/Products';
+import Sales from '../views/sales/Sales';
+import Information from '../views/information/Information';
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { connectionBD } from '../BD/connection'
+import db from '../BD/connection'
 const Menu = () => {
-    let db = null;
-    useEffect(() => {
-        db = connectionBD();
-        console.log(db)
-    }, [])
-
 
     const Tab = createBottomTabNavigator();
 
@@ -52,9 +46,9 @@ const Menu = () => {
                 tabBarInactiveTintColor: 'gray',
             })}
         >
-            <Tab.Screen name='Sales' component={Sales} />
-            <Tab.Screen name='Products' component={Products} />
-            <Tab.Screen name='Information' component={Information} />
+            <Tab.Screen name='Sales' component={Sales} initialParams={{ db: db }} />
+            <Tab.Screen name='Products' component={Products} initialParams={{ db: db }} />
+            <Tab.Screen name='Information' component={Information} initialParams={{ db: db }} />
         </Tab.Navigator>
     )
 }
