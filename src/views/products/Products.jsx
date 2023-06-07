@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, SafeAreaView, ToastAndroid } from 'react-native'
 
-const Products = ({ route }) => {
-
-    const { db } = route.params;
-
-    console.log("first", db)
+const Products = () => {
 
     const [nombreProducto, setNombreProducto] = useState("");
     const [precioProducto, setPrecioProducto] = useState(0.0)
