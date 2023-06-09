@@ -16,7 +16,7 @@ const Menu = () => {
     if (db) {
       db.transaction(tx => {
         tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, nombre_producto TEXT, precio REAL);',
+          'CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre_producto TEXT, precio REAL);',
           [],
           () => console.log('Tabla creada exitosamente'),
           error => console.log('Error al crear la tabla: ', error)

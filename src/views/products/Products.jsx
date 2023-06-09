@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, SafeAreaView, ToastAndroid } from 'react-native'
-
+import React, { useContext, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Button, SafeAreaView, ToastAndroid, TouchableOpacity } from 'react-native'
+import { DatabaseContext } from '../../BD/DatabaseContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
 const Products = () => {
 
+    const db = useContext(DatabaseContext)
+    const [arrayProductos, setarrayProductos] = useState([])
     const [nombreProducto, setNombreProducto] = useState("");
     const [precioProducto, setPrecioProducto] = useState(0.0)
 
@@ -17,7 +20,20 @@ const Products = () => {
             return;
         }
 
-        ToastAndroid.show('El producto se registro de manera correcta', ToastAndroid.SHORT);
+        db.transaction(tx => {
+            tx.executeSql(`INSERT INTO products(nombre_producto, precio) VALUES (?, ?);`,
+                [nombreProducto, precioProducto],
+                (_, { insertId }) => {
+
+                    ToastAndroid.show('El producto se registro de manera correcta', insertId, ToastAndroid.SHORT)
+                    setNombreProducto("")
+                    setPrecioProducto(0.0)
+                },
+                (_, error) => console.log('Error al intentar guardar el producto', error)
+            );
+        })
+
+
     }
 
     return (
@@ -38,16 +54,20 @@ const Products = () => {
                 placeholder="$"
                 keyboardType="numeric"
             />
-            <View style={styles.buttonContainer}>
-                <Button
-                    title="Guardar"
-                    onPress={() => guardarProducto()}
-                    color="#EB4223" // Cambiar el color del botón (opcional)
+            {
+                /*<View style={styles.buttonContainer}>
+                    <Button
+                        title="Guardar"
+                        onPress={() => guardarProducto()}
+                        color="#EB4223" // Cambiar el color del botón (opcional)
+    
+                    />
+                 </View>*/
+            }
 
-                />
-            </View>
-
-
+            <TouchableOpacity style={styles.button}>
+                <Ionicons name='add' size={24} color="white" />
+            </TouchableOpacity>
         </SafeAreaView>
 
     )
@@ -74,6 +94,14 @@ const styles = StyleSheet.create({
         width: 200, // Ajustar el ancho deseado del contenedor del botón
         alignSelf: 'center', // Centrar el contenedor del botón
         marginTop: 12
+    }, button: {
+        backgroundColor: '#EB4223',
+        borderRadius: 50,
+        width: 60,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+
     }
 });
 export default Products
