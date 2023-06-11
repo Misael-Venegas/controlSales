@@ -1,107 +1,85 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, SafeAreaView, ToastAndroid, TouchableOpacity } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet, SafeAreaView, ToastAndroid, TouchableOpacity, Text, View } from 'react-native'
 import { DatabaseContext } from '../../BD/DatabaseContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import ModalAddProduct from './ModalAddProduct';
+
 const Products = () => {
 
     const db = useContext(DatabaseContext)
     const [arrayProductos, setarrayProductos] = useState([])
-    const [nombreProducto, setNombreProducto] = useState("");
-    const [precioProducto, setPrecioProducto] = useState(0.0)
+    const [verModalAgregarProoducto, setverModalAgregarProoducto] = useState(false)
+    const [actualizarLista, setActualizarLista] = useState(3.1416)
 
+    useEffect(() => {
+        fetchProducts();
+    }, [actualizarLista])
 
-    const guardarProducto = () => {
-        if (nombreProducto === "") {
-            ToastAndroid.show('Error: El nombre esta vacio', ToastAndroid.SHORT);
-            return;
-        }
-        if (precioProducto <= 0) {
-            ToastAndroid.show('Error: El precio debe ser mayor a cero', ToastAndroid.SHORT);
-            return;
-        }
-
+    const fetchProducts = () => {
         db.transaction(tx => {
-            tx.executeSql(`INSERT INTO products(nombre_producto, precio) VALUES (?, ?);`,
-                [nombreProducto, precioProducto],
-                (_, { insertId }) => {
+            tx.executeSql(
+                'SELECT * FROM products;',
+                [],
+                (_, { rows }) => {
+                    // const productsArray = Array.from(rows);
+                    setarrayProductos(rows._array);
 
-                    ToastAndroid.show('El producto se registro de manera correcta', insertId, ToastAndroid.SHORT)
-                    setNombreProducto("")
-                    setPrecioProducto(0.0)
                 },
-                (_, error) => console.log('Error al intentar guardar el producto', error)
+                (_, error) => ToastAndroid.show('Error: al obtener los productos de la BD' + error, ToastAndroid.SHORT)
             );
-        })
-
-
-    }
-
+        });
+    };
     return (
-        <SafeAreaView>
-            <Text style={styles.prosText} >Nombre del producto</Text>
-            <TextInput
-                style={styles.input}
-                onChangeText={(e) => setNombreProducto(e)}
-                value={nombreProducto}
-                placeholder="Nombre"
-                keyboardType="default"
-            />
-            <Text style={styles.prosText}>Precio</Text>
-            <TextInput
-                style={styles.input}
-                onChangeText={(e) => setPrecioProducto(e)}
-                value={precioProducto.toString()}
-                placeholder="$"
-                keyboardType="numeric"
-            />
-            {
-                /*<View style={styles.buttonContainer}>
-                    <Button
-                        title="Guardar"
-                        onPress={() => guardarProducto()}
-                        color="#EB4223" // Cambiar el color del botón (opcional)
-    
-                    />
-                 </View>*/
-            }
+        <SafeAreaView style={styles.containerView} >
 
-            <TouchableOpacity style={styles.button}>
+            {arrayProductos.map((product, key) => (
+                <View style={styles.cardLista} >
+                    <Text key={key} style={styles.prosText} >{product?.nombre_producto}</Text>
+                    <Text style={styles.propsTextPrice} > ${product?.precio} MXN</Text>
+                </View>
+            ))}
+
+            <TouchableOpacity style={styles.button} onPress={() => setverModalAgregarProoducto(true)} >
                 <Ionicons name='add' size={24} color="white" />
             </TouchableOpacity>
+
+            {
+                verModalAgregarProoducto && <ModalAddProduct setVisible={setverModalAgregarProoducto} visible={verModalAgregarProoducto} setActualizarLista={setActualizarLista} />
+            }
         </SafeAreaView>
 
     )
 }
 
 const styles = StyleSheet.create({
-    input: {
-        height: 40,
-        margin: 12,
-        borderWidth: 1,
-        padding: 10,
-        borderRadius: 7,
-        fontSize: 16,
-        color: '#333',
-        backgroundColor: '#fff',
-        borderColor: '#B3B3B3'
-    }, prosText: {
+    containerView: {
+        flex: 1,
+        marginLeft: 10,
+        marginRight: 10,
         marginTop: 10,
-        marginLeft: 12,
-        fontSize: 18,
-        fontWeight: 'bold',
+        marginBottom: 60
     },
-    buttonContainer: {
-        width: 200, // Ajustar el ancho deseado del contenedor del botón
-        alignSelf: 'center', // Centrar el contenedor del botón
-        marginTop: 12
-    }, button: {
+    button: {
+        position: 'absolute',
         backgroundColor: '#EB4223',
         borderRadius: 50,
         width: 60,
         height: 60,
         justifyContent: 'center',
         alignItems: 'center',
-
+        right: 0,
+        bottom: 0
+    }, cardLista: {
+        backgroundColor: '#FFF',
+        marginBottom: 5,
+        padding: 10,
+        borderRadius: 7
+    }, prosText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    }, propsTextPrice: {
+        fontWeight: 'bold',
+        color: 'gray'
     }
 });
 export default Products
