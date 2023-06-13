@@ -4,6 +4,8 @@ import {
     DatabaseContext
 } from '../../BD/DatabaseContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Toast from 'react-native-toast-message';
+
 const ModalAddProduct = ({ visible, setVisible, setActualizarLista }) => {
 
 
@@ -25,8 +27,11 @@ const ModalAddProduct = ({ visible, setVisible, setActualizarLista }) => {
             await tx.executeSql(`INSERT INTO products(nombre_producto, precio) VALUES (?, ?);`,
                 [nombreProducto, precioProducto],
                 (_, { insertId }) => {
-
-                    ToastAndroid.show('El producto se registro de manera correcta' + insertId, ToastAndroid.SHORT)
+                    Toast.show({
+                        type: 'success',
+                        text1: "Succes",
+                        text2: "El producto se registro de manera correcta"
+                    })
                     setNombreProducto("")
                     setPrecioProducto(0.0)
 

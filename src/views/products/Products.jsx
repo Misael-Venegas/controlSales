@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, ToastAndroid, TouchableOpacity, Text, View } from 'react-native'
+import { StyleSheet, SafeAreaView, ToastAndroid, TouchableOpacity, Text, View, Alert } from 'react-native'
 import { DatabaseContext } from '../../BD/DatabaseContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ModalAddProduct from './ModalAddProduct';
@@ -29,13 +29,63 @@ const Products = () => {
             );
         });
     };
+
+
+
+    const deleteProduct = (id) => {
+
+        Alert.alert(
+            'Confirmación',
+            '¿Estás seguro de que deseas eliminar este producto?', [
+            {
+                text: 'Cancelar',
+                style: 'cancel',
+            },
+            {
+                text: 'Eliminar',
+                style: 'destructive',
+                onPress: () => {
+                    db.transaction(tx => {
+                        tx.executeSql(
+                            `DELETE FROM products WHERE id=${id}`,
+                            [],
+                            () => {
+                                ToastAndroid.show('Producto eliminado', ToastAndroid.SHORT);
+                                setActualizarLista(Math.random());
+                            },
+                            (_, error) =>
+                                ToastAndroid.show(
+                                    'Error al intentar eliminar el producto' + error,
+                                    ToastAndroid.SHORT
+                                )
+                        );
+                    });
+                },
+            },
+        ],
+            { cancelable: true }
+        )
+
+    }
     return (
         <SafeAreaView style={styles.containerView} >
 
             {arrayProductos.map((product, key) => (
-                <View style={styles.cardLista} >
-                    <Text key={key} style={styles.prosText} >{product?.nombre_producto}</Text>
-                    <Text style={styles.propsTextPrice} > ${product?.precio} MXN</Text>
+                <View key={key} style={styles.cardLista} >
+                    <View style={styles.iconContainer}>
+                        <Ionicons name="checkmark-circle-outline" size={24} color="#EB4223" />
+                    </View>
+                    <View style={styles.infoContainer} >
+                        <Text style={styles.prosText} >{product?.nombre_producto}</Text>
+                        <Text style={styles.propsTextPrice} > ${product?.precio} MXN</Text>
+                    </View>
+                    <View>
+                        <Ionicons name="md-pencil-sharp" size={24} color="black" />
+                    </View>
+                    <View style={styles.propsIconDelete} >
+                        <Ionicons name="trash" size={24} color="#DC001A" onPress={() => deleteProduct(product.id)} />
+                    </View>
+
                 </View>
             ))}
 
@@ -70,16 +120,33 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0
     }, cardLista: {
-        backgroundColor: '#FFF',
-        marginBottom: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
         padding: 10,
-        borderRadius: 7
-    }, prosText: {
+        backgroundColor: "#fff",
+        borderRadius: 7,
+        marginBottom: 5
+        // Otros estilos para el contenedor principal
+    },
+    iconContainer: {
+        marginRight: 10,
+        // Otros estilos para el contenedor del ícono
+    },
+    infoContainer: {
+        flex: 1,
+        // Otros estilos para el contenedor de información
+    },
+    prosText: {
         fontSize: 16,
         fontWeight: 'bold',
-    }, propsTextPrice: {
-        fontWeight: 'bold',
-        color: 'gray'
+        // Otros estilos para el texto de pros
+    },
+    propsTextPrice: {
+        fontSize: 14,
+        // Otros estilos para el texto de precio
+    },
+    propsIconDelete: {
+        marginLeft: 5
     }
 });
 export default Products
