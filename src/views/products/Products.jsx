@@ -3,6 +3,7 @@ import { StyleSheet, SafeAreaView, ToastAndroid, TouchableOpacity, Text, View, A
 import { DatabaseContext } from '../../BD/DatabaseContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ModalAddProduct from './ModalAddProduct';
+import ModalEditarProducto from './ModalEditarProducto';
 
 const Products = () => {
 
@@ -10,7 +11,8 @@ const Products = () => {
     const [arrayProductos, setarrayProductos] = useState([])
     const [verModalAgregarProoducto, setverModalAgregarProoducto] = useState(false)
     const [actualizarLista, setActualizarLista] = useState(3.1416)
-
+    const [modalEditarProducto, setModalEditarProducto] = useState(false)
+    const [datosEditar, setDatosEditar] = useState(null)
     useEffect(() => {
         fetchProducts();
     }, [actualizarLista])
@@ -21,7 +23,6 @@ const Products = () => {
                 'SELECT * FROM products;',
                 [],
                 (_, { rows }) => {
-                    // const productsArray = Array.from(rows);
                     setarrayProductos(rows._array);
 
                 },
@@ -30,7 +31,11 @@ const Products = () => {
         });
     };
 
+    const abrirModaelEditar = (datos) => {
+        setDatosEditar(datos)
+        setModalEditarProducto(true)
 
+    }
 
     const deleteProduct = (id) => {
 
@@ -80,7 +85,7 @@ const Products = () => {
                         <Text style={styles.propsTextPrice} > ${product?.precio} MXN</Text>
                     </View>
                     <View>
-                        <Ionicons name="md-pencil-sharp" size={24} color="black" />
+                        <Ionicons name="md-pencil-sharp" size={24} color="black" onPress={() => abrirModaelEditar(product)} />
                     </View>
                     <View style={styles.propsIconDelete} >
                         <Ionicons name="trash" size={24} color="#DC001A" onPress={() => deleteProduct(product.id)} />
@@ -95,6 +100,9 @@ const Products = () => {
 
             {
                 verModalAgregarProoducto && <ModalAddProduct setVisible={setverModalAgregarProoducto} visible={verModalAgregarProoducto} setActualizarLista={setActualizarLista} />
+            }
+            {
+                modalEditarProducto && <ModalEditarProducto datos={datosEditar} setActualizarLista={setActualizarLista} visible={modalEditarProducto} setVisible={setModalEditarProducto} />
             }
         </SafeAreaView>
 

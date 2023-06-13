@@ -5,16 +5,17 @@ import {
 } from '../../BD/DatabaseContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
-
-
-const ModalAddProduct = ({ visible, setVisible, setActualizarLista }) => {
-
+const ModalEditarProducto = ({ visible, setVisible, setActualizarLista, datos }) => {
 
     const db = useContext(DatabaseContext)
-    const [nombreProducto, setNombreProducto] = useState("");
-    const [precioProducto, setPrecioProducto] = useState(0.0)
+    const [nombreProducto, setNombreProducto] = useState(datos?.nombre_producto);
+    const [precioProducto, setPrecioProducto] = useState(datos?.precio)
 
-    const guardarProducto = async () => {
+    const cerrarModal = () => {
+        setVisible(false)
+    }
+
+    const guardarProducto = () => {
         if (nombreProducto === "") {
             Toast.show({
                 type: 'error',
@@ -32,34 +33,29 @@ const ModalAddProduct = ({ visible, setVisible, setActualizarLista }) => {
             return;
         }
 
-        await db.transaction(async tx => {
-            await tx.executeSql(`INSERT INTO products(nombre_producto, precio) VALUES (?, ?);`,
-                [nombreProducto, precioProducto],
-                (_, { insertId }) => {
+        db.transaction(tx => {
+            tx.executeSql(`UPDATE products set nombre_producto='${nombreProducto}', precio=${precioProducto} WHERE id=${datos.id} `,
+                [], () => {
                     Toast.show({
                         type: 'success',
                         text1: "Succes",
-                        text2: "El producto se registro de manera correcta"
+                        text2: "El producto se actualizo de manera correcta"
                     })
                     setNombreProducto("")
                     setPrecioProducto(0.0)
-
-                },
-                (_, error) => Toast.show({
-                    type: 'error',
-                    text1: 'Error',
-                    text2: 'Error al intentar guardar el producto'
+                    setActualizarLista(Math.random())
+                    setVisible(false)
+                }, (_, error) => {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Error al intentar actualizar el producto ' + error
+                    })
                 })
-            );
         })
 
-
     }
 
-    const cerrarModal = () => {
-        setActualizarLista(Math.random())
-        setVisible(false)
-    }
     return (
         <View style={styles.centeredView} >
             <Modal
@@ -67,12 +63,11 @@ const ModalAddProduct = ({ visible, setVisible, setActualizarLista }) => {
                 transparent={true}
                 visible={visible}
                 onRequestClose={() => setVisible(false)}
+
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-
                         <Ionicons name="close" size={24} color="black" onPress={() => cerrarModal()} style={styles.closeIcon} />
-
 
                         <Text style={styles.prosText} >Nombre del producto</Text>
                         <TextInput
@@ -164,4 +159,5 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end'
     }
 });
-export default ModalAddProduct
+
+export default ModalEditarProducto

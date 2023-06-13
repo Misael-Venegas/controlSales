@@ -12,7 +12,7 @@ export default function App() {
         <NavigationContainer>
 
           <Menu />
-          <Toast ref={(ref) => Toast.setRef(ref)} />
+          <Toast/>
 
         </NavigationContainer>
       </DatabaseProvider>
