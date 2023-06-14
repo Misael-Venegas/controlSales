@@ -11,11 +11,11 @@ const Menu = () => {
   const db = useContext(DatabaseContext);
 
   const Tab = createBottomTabNavigator();
-  
+
   useEffect(() => {
     if (db) {
-      db.transaction(tx => {
-        tx.executeSql(
+      db.transaction(async tx => {
+        await tx.executeSql(
           'CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre_producto TEXT, precio REAL);',
           [],
           () => console.log('Tabla creada exitosamente'),

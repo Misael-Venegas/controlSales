@@ -4,6 +4,7 @@ import { DatabaseContext } from '../../BD/DatabaseContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ModalAddProduct from './ModalAddProduct';
 import ModalEditarProducto from './ModalEditarProducto';
+import Toast from 'react-native-toast-message';
 
 const Products = () => {
 
@@ -15,20 +16,27 @@ const Products = () => {
     const [datosEditar, setDatosEditar] = useState(null)
     useEffect(() => {
         fetchProducts();
-    }, [actualizarLista])
+    }, [db, actualizarLista])
 
     const fetchProducts = () => {
-        db.transaction(tx => {
-            tx.executeSql(
-                'SELECT * FROM products;',
-                [],
-                (_, { rows }) => {
-                    setarrayProductos(rows._array);
 
-                },
-                (_, error) => ToastAndroid.show('Error: al obtener los productos de la BD' + error, ToastAndroid.SHORT)
-            );
-        });
+        if (db) {
+            db.transaction(tx => {
+                tx.executeSql(
+                    'SELECT * FROM products;',
+                    [],
+                    (_, { rows }) => {
+                        setarrayProductos(rows._array);
+                    },
+                    (_, error) => Toast.show({
+                        type: 'error',
+                        text1: 'Products',
+                        text2: 'al obtener los productos de la BD'
+                    })
+                );
+            });
+        }
+
     };
 
     const abrirModaelEditar = (datos) => {
@@ -77,9 +85,11 @@ const Products = () => {
 
             {arrayProductos.map((product, key) => (
                 <View key={key} style={styles.cardLista} >
-                    <View style={styles.iconContainer}>
-                        <Ionicons name="checkmark-circle-outline" size={24} color="#EB4223" />
-                    </View>
+                    {
+                        /*  <View style={styles.iconContainer}>
+                              <Ionicons name="checkmark-circle-outline" size={24} color="#EB4223" />
+                          </View> */
+                    }
                     <View style={styles.infoContainer} >
                         <Text style={styles.prosText} >{product?.nombre_producto}</Text>
                         <Text style={styles.propsTextPrice} > ${product?.precio} MXN</Text>
