@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useState } from "react"
 import { DatabaseContext } from "../../BD/DatabaseContext"
 import Toast from 'react-native-toast-message';
 const Sales = () => {
+    //un comentario nomas
+
     const [listaProductos, setListaProductos] = useState([])
     const db = useContext(DatabaseContext)
 
